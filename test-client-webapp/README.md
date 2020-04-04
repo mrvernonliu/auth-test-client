@@ -1,0 +1,1 @@
+http://localhost:3000/sso?accessCode=432579483254325432
