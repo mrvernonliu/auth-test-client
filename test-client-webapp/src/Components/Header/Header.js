@@ -14,13 +14,14 @@ export default class Header extends Component {
         if (this.state.loggedIn) {
             return (
                 <li className="nav-item active">
-                    <a className="nav-link" href="#">User <span className="sr-only">(current)</span></a>
+                    <div className="nav-link">User <span className="sr-only">(current)</span></div>
                 </li>   
             )
         }
+        let loginURL = process.env.REACT_APP_LOGINURL;
         return (
             <li className="nav-item active">
-                <a className="nav-link" href="http://auth.vernonliu.com/login?clientUuid=5d94fdf7-85d0-49c0-a5c2-1b87424bd716&redirectUrl=https://vernonliu.com">Login <span className="sr-only">(current)</span></a>
+                <a className="nav-link login" href={loginURL}>Login <span className="sr-only">(current)</span></a>
             </li>
         )
     }

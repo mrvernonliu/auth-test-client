@@ -24,14 +24,13 @@ export default class HomePage extends Component {
             this.setState({
                 message: responseJson
             });
-            console.log(this.state);
         });
     }
 
     displayData() {
         let message = this.state.message;
         let textColor = "green";
-        if (this.state.responseCode != 200) {
+        if (this.state.responseCode !== 200) {
             textColor = "red";
         }
         return <p className = {textColor}>{message}</p>
