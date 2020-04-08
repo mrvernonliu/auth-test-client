@@ -1,0 +1,41 @@
+# This docker-compose file is meant for testing, it will not deploy the full application
+version: '3'
+services:
+    test-client-dispatcher:
+        image: mrvernonliu/test-client-dispatcher:0.0.1
+        ports:
+            - "82:80"
+        networks:
+            - testClientNetwork
+        links:
+            - "test-client-server"
+            - "test-client-webapp"
+    test-client-server:
+        image: mrvernonliu/test-client-server:0.0.1
+        networks:
+            - testClientNetwork
+        environment:
+            - AUTHENTICATION_DB_USER=${AUTHENTICATION_DB_USER}
+            - AUTHENTICATION_DB_PASSWORD=${AUTHENTICATION_DB_PASSWORD}
+            - AUTHENTICATION_DB_NAME=${AUTHENTICATION_DB_NAME}
+            - AUTHENTICATION_DB_HOST=${AUTHENTICATION_DB_HOST}
+            - AUTHENTICATION_DB_PORT=${AUTHENTICATION_DB_PORT}
+            - AUTHENTICATION_DB_SSL=${AUTHENTICATION_DB_SSL}
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_WEBAPP_ORIGIN=${AUTH_WEBAPP_ORIGIN}
+            - AUTH_WEBAPP_DOMAIN=${AUTH_WEBAPP_DOMAIN}
+            - APPLICATION_TITLE="Fake Coursespaces"
+            - AUTH_SERVER_LOGIN_URL="http://auth.vernonliu.com"
+            - AUTH_REDIRECT_URL="http://coursespaces.fakeuvic.vernonliu.com/sso"
+            - AUTH_CLIENT_UUID="5d94fdf7-85d0-49c0-a5c2-1b87424bd716"
+            - AUTH_CLIENT_SECRET=
+    test-client-webapp:
+        image: mrvernonliu/test-client-webapp:0.0.1
+        environment:
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_SERVER_PORT=${AUTH_SERVER_PORT}
+            
+        networks:
+            - testClientNetwork
+networks:
+    testClientNetwork:

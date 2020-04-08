@@ -6,8 +6,27 @@ export default class Header extends Component {
     constructor() {
         super();
         this.state = {
-            loggedIn: false
+            loggedIn: false,
+            applicationTitle: "placeholder",
+            loginUrl: ""
         }
+    }
+
+    componentWillMount() {
+        let host = process.env.REACT_APP_LOCALDEV_API_URL || "";
+        fetch(host + "/api/testdata/navbar", {
+            method: "GET",
+            headers: {"Accept": "application/json"}
+        }).then((response) => {
+            return response.json()
+        }).then((response) => {
+            console.log(response);
+            this.setState({
+                applicationTitle: response["APPLICATION_TITLE"].replace(/"/g,""),
+                loginUrl: response["LOGIN_URL"].replace("http://", "").replace("https://", "").replace(/"/g,"")
+            })
+            console.log(this.state);
+        })
     }
 
     loggedIn() {
@@ -18,17 +37,17 @@ export default class Header extends Component {
                 </li>   
             )
         }
-        let loginURL = process.env.REACT_APP_LOGINURL;
+
         return (
             <li className="nav-item active">
-                <a className="nav-link login" href={loginURL}>Login <span className="sr-only">(current)</span></a>
+                <a className="nav-link login" href={"//" + this.state.loginUrl}>Login <span className="sr-only">(current)</span></a>
             </li>
         )
     }
 
     getServiceName() {
         let title = process.env.REACT_APP_TITLE || "PLACEHOLDER"
-        return <div className="navbar-brand">{title}</div>
+        return <div className="navbar-brand">{this.state.applicationTitle}</div>
     }
 
     render() {

@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vernonliu.auth-server.test-client-server</groupId>
-	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>test-client-server</artifactId>
+	<version>0.0.1</version>
 	<name>test-client-server</name>
 	<description>test client for the multitenant auth server</description>
 

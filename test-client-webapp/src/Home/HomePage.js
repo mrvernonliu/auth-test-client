@@ -12,7 +12,8 @@ export default class HomePage extends Component {
     }
 
     componentDidMount() {
-        fetch("http://localhost:8080/api/testdata", {
+        let host = process.env.REACT_APP_LOCALDEV_API_URL || "";
+        fetch(host + "/api/testdata", {
             method: "GET",
             headers: {"Accept": "application/json"}
         }).then((response) => {
