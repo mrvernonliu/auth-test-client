@@ -1,9 +1,15 @@
 package com.vernonliu.authserver.testclientserver.login.controller;
 
+import com.vernonliu.authserver.testclientserver.login.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,9 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/login")
 public class LoginController {
 
-    @GetMapping("")
-    public void getLoginURL(HttpServletResponse response) {
-        response.setStatus(302);
-        response.setHeader("Location", "http://auth.vernonliu.com/login?clientUuid=5d94fdf7-85d0-49c0-a5c2-1b87424bd716&redirectUrl=https://vernonliu.com");
+    private static final String SELF_DOMAIN_URL = System.getenv("SELF_DOMAIN_URL");
+
+    @Autowired
+    LoginService loginService;
+
+    @PostMapping("/sso")
+    public ResponseEntity<?> getSSOTokens(HttpServletResponse response, @RequestParam String accessCode) {
+        String tokens = loginService.accessCodeExchange(accessCode);
+        return new ResponseEntity<>(tokens, HttpStatus.OK);
     }
 }

@@ -18,6 +18,16 @@ export default class SSOPage extends Component {
         return null;
     }
 
+    componentWillMount() {
+        fetch("/api/login/sso?accessCode=" + this.state.accessCode, {
+            method: "POST",
+        }).then((response) => {
+            response.text();
+        }).then((response) => {
+            console.log(response);
+        })
+    }
+
     render() {
         // If the render function is called, something went wrong
         return (
