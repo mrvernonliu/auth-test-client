@@ -61,12 +61,13 @@ services:
             - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
             - AUTH_WEBAPP_ORIGIN=${AUTH_WEBAPP_ORIGIN}
             - AUTH_WEBAPP_DOMAIN=${AUTH_WEBAPP_DOMAIN}
-            - APPLICATION_TITLE="Fake Coursespaces"
-            - AUTH_SERVER_LOGIN_URL="http://auth.vernonliu.com"
-            - AUTH_REDIRECT_URL="http://coursespaces.fakeuvic.vernonliu.com/sso"
-            - AUTH_CLIENT_UUID="55fba276-b6bf-4093-8f66-d93777602415"
-            - AUTH_CLIENT_SECRET="YfbwLJXqLnBBeuzy4bLrWw0MkGN0d8vV8YqJu-hETu4aO5EmoHsoGndLlY-A4INwOk_v7MEEtKoPeCOq0iISDA"
-            - SELF_DOMAIN_URL="http://coursespaces.fakeuvic.vernonliu.com"
+            - APPLICATION_TITLE=Fake Coursespaces
+            - AUTH_SERVER_LOGIN_URL=http://auth.vernonliu.com
+            - AUTH_REDIRECT_URL=http://coursespaces.fakeuvic.vernonliu.com/sso
+            - AUTH_CLIENT_UUID=55fba276-b6bf-4093-8f66-d93777602415
+            - AUTH_CLIENT_SECRET=YfbwLJXqLnBBeuzy4bLrWw0MkGN0d8vV8YqJu-hETu4aO5EmoHsoGndLlY-A4INwOk_v7MEEtKoPeCOq0iISDA
+            - SELF_DOMAIN_URL=http://coursespaces.fakeuvic.vernonliu.com
+            - COOKIE_DOMAIN=fakeuvic.vernonliu.com
 
     test-client-webapp:
         image: mrvernonliu/test-client-webapp:0.0.1

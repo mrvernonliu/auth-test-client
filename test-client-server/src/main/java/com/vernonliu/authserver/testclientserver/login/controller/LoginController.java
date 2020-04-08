@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
@@ -24,8 +25,11 @@ public class LoginController {
     LoginService loginService;
 
     @PostMapping("/sso")
-    public ResponseEntity<?> getSSOTokens(HttpServletResponse response, @RequestParam String accessCode) {
-        String tokens = loginService.accessCodeExchange(accessCode);
-        return new ResponseEntity<>(tokens, HttpStatus.OK);
+    public void getSSOTokens(HttpServletResponse response, @RequestParam String accessCode) {
+        Cookie[] tokens = loginService.accessCodeExchange(accessCode);
+        response.addCookie(tokens[0]);
+        response.addCookie(tokens[1]);
+        response.setStatus(204);
+        response.setHeader("Location", SELF_DOMAIN_URL);
     }
 }

@@ -15,7 +15,8 @@ export default class HomePage extends Component {
         let host = process.env.REACT_APP_LOCALDEV_API_URL || "";
         fetch(host + "/api/testdata", {
             method: "GET",
-            headers: {"Accept": "application/json"}
+            headers: {"Accept": "application/json"},
+            credentials: "include"
         }).then((response) => {
             this.setState({
                 responseCode: response["status"]
