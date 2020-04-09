@@ -8,8 +8,6 @@ export default class SSOPage extends Component {
         this.state = {
             accessCode: this.getAccessCode() || "error"
         }
-        console.log(this.state.accessCode);
-        //TODO: POST to API with accessCode and have the API return jwt cookies
     }
 
     getAccessCode() {

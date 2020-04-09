@@ -1,0 +1,1 @@
+docker build -t mrvernonliu/connex-dispatcher:0.0.1 .

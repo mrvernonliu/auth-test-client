@@ -1,1 +1,0 @@
-docker build -t mrvernonliu/test-client-dispatcher:0.0.1 .
