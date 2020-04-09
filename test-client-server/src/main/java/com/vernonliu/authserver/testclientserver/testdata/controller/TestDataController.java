@@ -1,7 +1,9 @@
 package com.vernonliu.authserver.testclientserver.testdata.controller;
 
+import com.vernonliu.authserver.testclientserver.authentication.service.AuthenticationService;
 import com.vernonliu.authserver.testclientserver.testdata.entity.Navbar;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -23,12 +25,15 @@ public class TestDataController {
 
     private static final Navbar navbar = new Navbar();
 
+    @Autowired
+    AuthenticationService authenticationService;
+
     @ResponseBody
     @GetMapping("")
     public ResponseEntity<?> getProtectedData(HttpServletRequest request) {
         log.info("Trying to access protected data");
-        boolean loggedIn = false;
-        if (loggedIn) {
+
+        if (authenticationService.isValidateAccessToken(request)) {
             return new ResponseEntity<>("Here is some protected data!", HttpStatus.OK);
         }
         return new ResponseEntity<>("Please log in to review protected data", HttpStatus.FORBIDDEN);

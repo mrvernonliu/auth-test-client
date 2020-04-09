@@ -22,16 +22,17 @@ export default class SSOPage extends Component {
         fetch("/api/login/sso?accessCode=" + this.state.accessCode, {
             method: "POST",
         }).then((response) => {
-            response.text();
-        }).then((response) => {
-            console.log(response);
+            let location = response.headers.get('Location');
+            if (location) {
+                window.location.href = location;
+            }
         })
     }
 
     render() {
         // If the render function is called, something went wrong
         return (
-            <p>Something went wrong</p>
+            <p>Please wait while we log you in!</p>
         );
     }
 }

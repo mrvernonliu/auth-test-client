@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Cookie from "js-cookie";
+import jwt from "jwt-decode";
 import "./Header.css";
 
 export default class Header extends Component {
@@ -6,9 +8,8 @@ export default class Header extends Component {
     constructor() {
         super();
         this.state = {
-            loggedIn: false,
             applicationTitle: "placeholder",
-            loginUrl: ""
+            loginUrl: "",
         }
     }
 
@@ -20,22 +21,41 @@ export default class Header extends Component {
         }).then((response) => {
             return response.json()
         }).then((response) => {
-            console.log(response);
             this.setState({
                 applicationTitle: response["APPLICATION_TITLE"].replace(/"/g,""),
                 loginUrl: response["LOGIN_URL"].replace("http://", "").replace("https://", "").replace(/"/g,"")
             })
-            console.log(this.state);
+        })
+    }
+
+    logout = (e) => {
+        e.preventDefault();
+        let host = process.env.REACT_APP_LOCALDEV_API_URL || "";
+        fetch(host + "/api/sso/invalidate", {
+            method: "POST",
+            headers: {"Accept": "application/json"}
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            let domain = response["DOMAIN"];
+            let path = response["PATH"];
+            Cookie.remove('ti', { path: path, domain: domain })
+            Cookie.remove('ta', { path: path, domain: domain })
+            window.location.reload();
         })
     }
 
     loggedIn() {
-        if (this.state.loggedIn) {
-            return (
-                <li className="nav-item active">
-                    <div className="nav-link">User <span className="sr-only">(current)</span></div>
-                </li>   
-            )
+        let identityToken = Cookie.get("ti");
+        if (identityToken) {
+            identityToken = jwt(identityToken);
+            if (identityToken["firstname"]) {
+                return (
+                    <li className="nav-item active">
+                        <a className="nav-link" href="#" onClick={this.logout}>{identityToken["firstname"]} <span className="sr-only">(current)</span></a>
+                    </li>   
+                )
+            }
         }
 
         return (

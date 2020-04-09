@@ -66,6 +66,7 @@ services:
             - AUTH_REDIRECT_URL=http://coursespaces.fakeuvic.vernonliu.com/sso
             - AUTH_CLIENT_UUID=55fba276-b6bf-4093-8f66-d93777602415
             - AUTH_CLIENT_SECRET=YfbwLJXqLnBBeuzy4bLrWw0MkGN0d8vV8YqJu-hETu4aO5EmoHsoGndLlY-A4INwOk_v7MEEtKoPeCOq0iISDA
+            - AUTH_JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPoI3lohu4PGV064WPnozft1kdj8wNlw6lUmuegzbIm11KbwAH/cVdUa6dNR0nwgrEgeX7+AVgFz2b6L/35UlsQ==-----END PUBLIC KEY-----
             - SELF_DOMAIN_URL=http://coursespaces.fakeuvic.vernonliu.com
             - COOKIE_DOMAIN=fakeuvic.vernonliu.com
 

@@ -1,32 +1,33 @@
-package com.vernonliu.authserver.testclientserver.login.controller;
+package com.vernonliu.authserver.testclientserver.authentication.controller;
 
-import com.vernonliu.authserver.testclientserver.login.service.LoginService;
+import com.vernonliu.authserver.testclientserver.authentication.service.AuthenticationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @Controller
 @Slf4j
 @RequestMapping("/login")
-public class LoginController {
+public class AuthenticationController {
 
     private static final String SELF_DOMAIN_URL = System.getenv("SELF_DOMAIN_URL");
 
     @Autowired
-    LoginService loginService;
+    AuthenticationService authenticationService;
 
     @PostMapping("/sso")
     public void getSSOTokens(HttpServletResponse response, @RequestParam String accessCode) {
-        Cookie[] tokens = loginService.accessCodeExchange(accessCode);
+        Cookie[] tokens = authenticationService.accessCodeExchange(accessCode);
         response.addCookie(tokens[0]);
         response.addCookie(tokens[1]);
         response.setStatus(204);
