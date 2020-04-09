@@ -14,7 +14,7 @@ services:
             - "auth-webapp"
 
     auth-server:
-        image: mrvernonliu/auth-server:0.0.2
+        image: mrvernonliu/auth-server:0.0.3
         networks:
             - privateNetwork
         environment:
