@@ -1,0 +1,1 @@
+docker build -t mrvernonliu/fakeuvic-dispatcher:0.0.1 .

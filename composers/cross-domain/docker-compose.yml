@@ -1,0 +1,134 @@
+# This docker-compose file is meant for testing, it will not deploy the full application
+version: '3'
+services:
+
+## Auth server
+    auth-dispatcher:
+        image: mrvernonliu/auth-dispatcher:0.0.1
+        ports:
+            - "81:80"
+        networks:
+            - privateNetwork
+        links:
+            - "auth-server"
+            - "auth-webapp"
+
+    auth-server:
+        image: mrvernonliu/auth-server:0.0.3
+        networks:
+            - privateNetwork
+        environment:
+            - AUTHENTICATION_DB_USER=${AUTHENTICATION_DB_USER}
+            - AUTHENTICATION_DB_PASSWORD=${AUTHENTICATION_DB_PASSWORD}
+            - AUTHENTICATION_DB_NAME=${AUTHENTICATION_DB_NAME}
+            - AUTHENTICATION_DB_HOST=${AUTHENTICATION_DB_HOST}
+            - AUTHENTICATION_DB_PORT=${AUTHENTICATION_DB_PORT}
+            - AUTHENTICATION_DB_SSL=${AUTHENTICATION_DB_SSL}
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_WEBAPP_ORIGIN=${AUTH_WEBAPP_ORIGIN}
+            - AUTH_WEBAPP_DOMAIN=${AUTH_WEBAPP_DOMAIN}
+
+    auth-webapp:
+        image: mrvernonliu/auth-webapp:0.0.3
+        environment:
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_SERVER_PORT=${AUTH_SERVER_PORT}
+        networks:
+            - privateNetwork
+
+
+## Application 1
+    fakeuvic-dispatcher:
+        image: mrvernonliu/fakeuvic-dispatcher:0.0.1
+        ports:
+            - "84:80"
+        networks:
+            - privateNetwork
+        links:
+            - "fakeuvic-server:test-client-server"
+            - "fakeuvic-webapp:test-client-webapp"
+            - "auth-dispatcher"
+
+    fakeuvic-server:
+        image: mrvernonliu/test-client-server:0.0.1
+        networks:
+            - privateNetwork
+        links:
+            - "auth-dispatcher:auth.vernonliu.com"
+        environment:
+            - AUTHENTICATION_DB_USER=${AUTHENTICATION_DB_USER}
+            - AUTHENTICATION_DB_PASSWORD=${AUTHENTICATION_DB_PASSWORD}
+            - AUTHENTICATION_DB_NAME=${AUTHENTICATION_DB_NAME}
+            - AUTHENTICATION_DB_HOST=${AUTHENTICATION_DB_HOST}
+            - AUTHENTICATION_DB_PORT=${AUTHENTICATION_DB_PORT}
+            - AUTHENTICATION_DB_SSL=${AUTHENTICATION_DB_SSL}
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_WEBAPP_ORIGIN=${AUTH_WEBAPP_ORIGIN}
+            - AUTH_WEBAPP_DOMAIN=${AUTH_WEBAPP_DOMAIN}
+            - APPLICATION_TITLE=Fake Uvic
+            - AUTH_SERVER_LOGIN_URL=http://auth.vernonliu.com
+            - AUTH_REDIRECT_URL=http://fakeuvic.com/sso
+            - AUTH_CLIENT_UUID=b8a9f3f6-e953-4410-bb1c-585e217dbb95
+            - AUTH_CLIENT_SECRET=fWMzxolD7NzmLwgvaLz2NLuCdPzsRfGdk_Flu4-nsR4kNeNmWb8SwTtZ0QmREN1ItOrMMfF3AGgk-DkKtEoFYA
+            - AUTH_JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgqfbr22ATVh9ElM5TWuOX+wKUmCWxTeW9JFqAPEkH/zR/NqtuOHAvxmoNKw/mz+EYJa8R/fOTQfKBI/12UPpVA==-----END PUBLIC KEY-----
+            - SELF_DOMAIN_URL=http://fakeuvic.com
+            - COOKIE_DOMAIN=fakeuvic.com
+
+    fakeuvic-webapp:
+        image: mrvernonliu/test-client-webapp:0.0.1
+        environment:
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_SERVER_PORT=${AUTH_SERVER_PORT}
+            
+        networks:
+            - privateNetwork
+
+
+  ## Application 2          
+    fakeubc-dispatcher:
+        image: mrvernonliu/fakeubc-dispatcher:0.0.1
+        ports:
+            - "85:80"
+        networks:
+            - privateNetwork
+        links:
+            - "fakeubc-server:test-client-server"
+            - "fakeubc-webapp:test-client-webapp"
+            - "auth-dispatcher"
+
+    fakeubc-server:
+        image: mrvernonliu/test-client-server:0.0.1
+        networks:
+            - privateNetwork
+        links:
+            - "auth-dispatcher:auth.vernonliu.com"
+        environment:
+            - AUTHENTICATION_DB_USER=${AUTHENTICATION_DB_USER}
+            - AUTHENTICATION_DB_PASSWORD=${AUTHENTICATION_DB_PASSWORD}
+            - AUTHENTICATION_DB_NAME=${AUTHENTICATION_DB_NAME}
+            - AUTHENTICATION_DB_HOST=${AUTHENTICATION_DB_HOST}
+            - AUTHENTICATION_DB_PORT=${AUTHENTICATION_DB_PORT}
+            - AUTHENTICATION_DB_SSL=${AUTHENTICATION_DB_SSL}
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_WEBAPP_ORIGIN=${AUTH_WEBAPP_ORIGIN}
+            - AUTH_WEBAPP_DOMAIN=${AUTH_WEBAPP_DOMAIN}
+            - APPLICATION_TITLE=Fake UBC
+            - AUTH_SERVER_LOGIN_URL=http://auth.vernonliu.com
+            - AUTH_REDIRECT_URL=http://fakeubc.com/sso
+            - AUTH_CLIENT_UUID=b8a9f3f6-e953-4410-bb1c-585e217dbb95
+            - AUTH_CLIENT_SECRET=fWMzxolD7NzmLwgvaLz2NLuCdPzsRfGdk_Flu4-nsR4kNeNmWb8SwTtZ0QmREN1ItOrMMfF3AGgk-DkKtEoFYA
+            - AUTH_JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgqfbr22ATVh9ElM5TWuOX+wKUmCWxTeW9JFqAPEkH/zR/NqtuOHAvxmoNKw/mz+EYJa8R/fOTQfKBI/12UPpVA==-----END PUBLIC KEY-----
+            - SELF_DOMAIN_URL=http://fakeubc.com
+            - COOKIE_DOMAIN=fakeubc.com
+
+    fakeubc-webapp:
+        image: mrvernonliu/test-client-webapp:0.0.1
+        environment:
+            - AUTH_SERVER_HOST=${AUTH_SERVER_HOST}
+            - AUTH_SERVER_PORT=${AUTH_SERVER_PORT}
+            
+        networks:
+            - privateNetwork
+
+networks:
+    privateNetwork:
