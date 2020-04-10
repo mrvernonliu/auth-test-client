@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
@@ -22,8 +23,10 @@ public class LogoutController {
     // TODO: call auth server and invalidate the user's refresh token.
     @PostMapping("/sso/invalidate")
     @ResponseBody
-    public Map logout(HttpServletResponse response) {
+    public Map logout(HttpServletRequest request, HttpServletResponse response) {
         log.info("A user is logging out"); // TODO: make more specific later when incorporating cookies
+        boolean successfulLogout = authenticationService.logoutFromIDP(request);
+        log.info("IDP logout success: {}", successfulLogout);
         Map cookieClearingDetails = authenticationService.getLogoutDetails();
         if (cookieClearingDetails == null) {
             response.setStatus(500);

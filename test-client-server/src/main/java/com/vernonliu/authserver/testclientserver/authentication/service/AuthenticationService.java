@@ -1,9 +1,11 @@
 package com.vernonliu.authserver.testclientserver.authentication.service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
@@ -31,6 +33,8 @@ public class AuthenticationService {
     private static Key publicKey;
 
     private static final URI AUTH_SERVER_SSO_ENDPOINT = URI.create(AUTH_SERVER_URL + "/api/authorization/sso");
+    private static final URI AUTH_SERVER_LOGOUT_ENDPOINT = URI.create(AUTH_SERVER_URL + "/api/authorization/logout");
+    private static final URI AUTH_SERVER_VALIDATION_ENDPOINT = URI.create(AUTH_SERVER_URL + "/api/authorization/reference-token-validation");
 
     public Cookie[] accessCodeExchange(String accessCode) {
         Map<String, String> exchangeRequest = Map.of(
@@ -56,6 +60,8 @@ public class AuthenticationService {
         return cookies;
     }
 
+    //BTW I don't actually check for authorization on self-contained tokens, just
+    // if they are valid jwt's or not.
     public boolean isValidateAccessToken(HttpServletRequest request) {
         if (request == null || request.getCookies() == null) return false;
         Cookie accessToken = Arrays.stream(request.getCookies())
@@ -65,7 +71,7 @@ public class AuthenticationService {
         if (accessToken == null) return false;
         log.info(accessToken.getValue());
 
-        if (!parseJwt(accessToken)) return false;
+        if (parseJwt(accessToken) == null) return false;
 
         Date expiration = Jwts.parserBuilder()
                 .setSigningKey(publicKey).build()
@@ -73,16 +79,83 @@ public class AuthenticationService {
                 .getBody()
                 .getExpiration();
         Date now = new Date();
-        return !expiration.before(now);
+        if (expiration.before(now)) return false;
+        Claims claims = parseJwt(accessToken);
+        if (claims == null) return false;
+        String referenceToken = (String)claims.get("referenceToken");
+        String accountUuid = (String)claims.get("sub");
+
+        if(!StringUtils.isEmpty(referenceToken)) {
+            return validateReferenceToken(referenceToken, accountUuid);
+        }
+        return true;
     }
 
-    private boolean parseJwt(Cookie accessToken) {
+    private boolean validateReferenceToken(String referenceToken, String accountUuid) {
+        Map<String, String> requestBody = Map.of(
+                "accountUuid", accountUuid,
+                "referenceToken", referenceToken,
+                "clientUuid", AUTH_CLIENT_UUID,
+                "clientSecret", AUTH_CLIENT_SECRET
+        );
+        RestTemplate restRequest = new RestTemplate();
+        Map result;
         try {
-            Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(accessToken.getValue().strip());
-            return true;
+            result = restRequest.postForObject(AUTH_SERVER_VALIDATION_ENDPOINT, requestBody, Map.class);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+        log.info("Validation request successful");
+        return true;
+    }
+
+    public boolean logoutFromIDP(HttpServletRequest request) {
+        Cookie ta = getCookie(request, "ta");
+        if (ta == null) return false;
+        Claims claims = parseJwt(ta);
+        if (claims == null) return false;
+        String accountId = (String)claims.get("sub");
+        Map<String, String> logoutRequest = Map.of(
+                "accountUuid", accountId,
+                "clientUuid", AUTH_CLIENT_UUID,
+                "clientSecret", AUTH_CLIENT_SECRET
+        );
+        log.info(logoutRequest.toString());
+        return dispatchLogoutRequestToIdp(logoutRequest);
+    }
+
+    private boolean dispatchLogoutRequestToIdp(Map<String, String> logoutRequest) {
+        RestTemplate restRequest = new RestTemplate();
+        log.info(logoutRequest.toString());
+        Map result;
+        try {
+            result = restRequest.postForObject(AUTH_SERVER_LOGOUT_ENDPOINT, logoutRequest, Map.class);
+        } catch (Exception e) {
+            log.error("Failed to logout: {}", e.getMessage());
+        }
+        log.info("Logout successful");
+        return true;
+    }
+
+    private Cookie getCookie(HttpServletRequest request, String cookieName) {
+        if (request == null || request.getCookies() == null) {
+            log.warn("Cannot refresh - no cookies attached");
+            return null;
+        }
+        Cookie cookie = Arrays.stream(request.getCookies())
+                .filter((c) -> cookieName.equals(c.getName()))
+                .findFirst()
+                .orElse(null);
+        return cookie;
+    }
+
+    private Claims parseJwt(Cookie accessToken) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(accessToken.getValue().strip()).getBody();
         } catch (JwtException e) {
             log.error("Failed to validate JWT: {}", e.getMessage());
-            return false;
+            return null;
         }
     }
 

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Cookie from "js-cookie";
 import "./HomePage.css";
 
 export default class HomePage extends Component {
@@ -21,12 +22,28 @@ export default class HomePage extends Component {
             this.setState({
                 responseCode: response["status"]
             });
+            if (response["status"] !== 200) this.logout();
             return response.text();
         }).then((responseJson) => {
             this.setState({
                 message: responseJson
             });
         });
+    }
+
+    logout() {
+        let host = process.env.REACT_APP_LOCALDEV_API_URL || "";
+        fetch(host + "/api/sso/invalidate", {
+            method: "POST",
+            headers: {"Accept": "application/json"}
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            let domain = response["DOMAIN"];
+            let path = response["PATH"];
+            Cookie.remove('ti', { path: path, domain: domain })
+            Cookie.remove('ta', { path: path, domain: domain })
+        })
     }
 
     displayData() {

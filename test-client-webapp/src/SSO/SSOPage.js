@@ -30,7 +30,7 @@ export default class SSOPage extends Component {
     render() {
         // If the render function is called, something went wrong
         return (
-            <p>Please wait while we log you in!</p>
+            <p></p>
         );
     }
 }
